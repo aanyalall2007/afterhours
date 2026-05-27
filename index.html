@@ -898,44 +898,14 @@ document.getElementById('wl-email').addEventListener('input', function() {
   if (this.value.length > 5) codeNudge.classList.add('show');
 });
 
-/* ── airtable config ────────────────────────────────────────────────────────
-   1. Sign up free at airtable.com
-   2. Create a base called "AfterHours Waitlist" — the table will be auto-created
-   3. Get your Base ID from the URL: airtable.com/YOUR_BASE_ID/...
-   4. Get a Personal Access Token: airtable.com/create/tokens
-      → scope: data.records:write  → access: your base only
-   5. Paste both below
-   ─────────────────────────────────────────────────────────────────────────── */
-const AIRTABLE = {
-  token:   'YOUR_AIRTABLE_TOKEN',   // ← pat_... token from airtable.com/create/tokens
-  baseId:  'YOUR_BASE_ID',          // ← appXXXXXXXXXXXXXX from the URL
-  table:   'Waitlist',
-};
-
-async function saveToAirtable(email, code, queueNum) {
-  if (AIRTABLE.token === 'YOUR_AIRTABLE_TOKEN') return; // skip if not configured
+async function saveToNotion(email, code, queueNum) {
   try {
-    await fetch(`https://api.airtable.com/v0/${AIRTABLE.baseId}/${encodeURIComponent(AIRTABLE.table)}`, {
+    await fetch('/api/waitlist', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        records: [{
-          fields: {
-            'Email':       email,
-            'Invite Code': code || '',
-            'School':      'USC',
-            'Queue #':     queueNum,
-            'Status':      'Waitlisted',
-          }
-        }]
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, queueNum }),
     });
-  } catch (err) {
-    console.warn('Airtable sync failed (signup still recorded):', err);
-  }
+  } catch (err) { console.warn('Signup save failed:', err); }
 }
 
 /* ── waitlist form ── */
