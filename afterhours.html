@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AfterHours — Something good is happening tonight.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=EB+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ══ RESET ══ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --bg:         #0A0A0A;
+  --surface:    #111111;
+  --s2:         #181818;
+  --text:       #F5F3EF;
+  --muted:      #636363;
+  --muted2:     #9A9A9A;
+  --gold:       #FFC72C;
+  --gold-dim:   rgba(255,199,44,0.12);
+  --cardinal:   #9D2235;
+  --border:     rgba(245,243,239,0.06);
+  --border2:    rgba(245,243,239,0.11);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  cursor: none;
+  animation: page-in 0.5s ease forwards;
+}
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; }
+
+/* ══ GRAIN ══ */
+.grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9000; opacity: 0.038;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 200px;
+  animation: grain-shift .1s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%  { background-position: 0 0 }       10% { background-position:-5% -10% }
+  20% { background-position: 10% 5% }    30% { background-position:-8%  25% }
+  40% { background-position: 20% -5% }   50% { background-position:-12% 15% }
+  60% { background-position: 5% -20% }   70% { background-position:-18%  8% }
+  80% { background-position: 15% 22% }  100% { background-position: 0 0 }
+}
+
+/* ══ CURSOR ══ */
+#cursor {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text);
+  position: fixed; z-index: 9999; pointer-events: none;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+  transition: width .15s ease, height .15s ease, opacity .15s ease;
+}
+#cursor.big { width: 24px; height: 24px; opacity: .45; }
+
+/* ══ NAV ══ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  padding: 22px 44px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(to bottom, rgba(10,10,10,.96) 0%, transparent 100%);
+}
+.nav-logo { font-size: 14px; font-weight: 500; letter-spacing: .2px; }
+.nav-right { display: flex; align-items: center; gap: 26px; }
+.nav-status {
+  font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--muted); display: flex; align-items: center; gap: 7px;
+}
+.status-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--cardinal);
+  animation: dot-pulse 2.5s ease-in-out infinite;
+}
+@keyframes dot-pulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(157,34,53,.5); }
+  50%      { opacity: .6; box-shadow: 0 0 0 5px rgba(157,34,53,0); }
+}
+.nav-apply {
+  font-size: 13px; font-weight: 400; color: var(--gold);
+  transition: opacity .2s;
+}
+.nav-apply:hover { opacity: .6; }
+
+/* ══ HERO ══ */
+#hero {
+  min-height: 100vh; position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 110px 44px 80px;
+}
+
+/* bokeh */
+.hero-bokeh { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.bokeh-layer { position: absolute; inset: -100px; filter: blur(88px); }
+.bk { position: absolute; border-radius: 50%; }
+.bk1 { width:620px;height:620px;top:-18%;left:-12%; background:radial-gradient(circle,rgba(255,199,44,.22) 0%,transparent 70%); animation:bk1 15s ease-in-out infinite alternate; }
+.bk2 { width:520px;height:520px;top:5%;right:-18%; background:radial-gradient(circle,rgba(157,34,53,.28) 0%,transparent 70%); animation:bk2 12s ease-in-out infinite alternate 2s; }
+.bk3 { width:460px;height:460px;bottom:0%;left:12%; background:radial-gradient(circle,rgba(255,199,44,.14) 0%,transparent 70%); animation:bk3 14s ease-in-out infinite alternate 1s; }
+.bk4 { width:360px;height:360px;top:40%;left:38%; background:radial-gradient(circle,rgba(200,50,70,.18) 0%,transparent 70%); animation:bk4 17s ease-in-out infinite alternate 3.5s; }
+.bk5 { width:300px;height:300px;bottom:15%;right:8%; background:radial-gradient(circle,rgba(255,180,20,.1) 0%,transparent 70%); animation:bk5 13s ease-in-out infinite alternate 4s; }
+@keyframes bk1 { from{transform:translate(0,0)} to{transform:translate(45px,-35px)} }
+@keyframes bk2 { from{transform:translate(0,0)} to{transform:translate(-30px,40px)} }
+@keyframes bk3 { from{transform:translate(0,0)} to{transform:translate(35px,-25px)} }
+@keyframes bk4 { from{transform:translate(0,0)} to{transform:translate(-40px,30px)} }
+@keyframes bk5 { from{transform:translate(0,0)} to{transform:translate(25px,-45px)} }
+
+/* vignette */
+.hero-vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 48%, transparent 22%, rgba(10,10,10,.82) 100%);
+}
+
+.hero-content { position: relative; z-index: 2; }
+
+/* staggered entrance */
+.hero-content > * {
+  opacity: 0;
+  animation: hero-up .9s cubic-bezier(.22,1,.36,1) forwards;
+}
+.live-badge   { animation-delay: .15s; }
+.hero-h       { animation-delay: .3s; }
+.hero-p       { animation-delay: .45s; }
+.btn-primary  { animation-delay: .58s; }
+.social-temp  { animation-delay: .72s; }
+@keyframes hero-up {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.live-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: .5px solid var(--border2); border-radius: 100px;
+  padding: 7px 16px; margin-bottom: 34px;
+  font-size: 11px; font-weight: 400; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--muted2);
+}
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+  animation: acc-pulse 2.8s ease-in-out infinite;
+}
+@keyframes acc-pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.hero-h {
+  font-size: clamp(44px, 7.5vw, 100px);
+  font-weight: 300;
+  line-height: 1.05; letter-spacing: -1.5px;
+  color: var(--text); margin-bottom: 22px;
+  max-width: 860px;
+}
+
+.hero-p {
+  font-size: 16px; font-weight: 300; color: var(--muted2);
+  line-height: 1.72; margin-bottom: 44px;
+  max-width: 360px; margin-left: auto; margin-right: auto;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--gold); color: #0A0A0A;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 500; letter-spacing: -.2px;
+  padding: 14px 32px; border-radius: 100px; border: none;
+  cursor: none; transition: opacity .2s, transform .15s;
+}
+.btn-primary:hover { opacity: .87; transform: scale(.985); }
+
+.social-temp {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 38px; padding: 10px 20px;
+  border: .5px solid var(--border); border-radius: 100px;
+  font-size: 12px; font-weight: 300; color: var(--muted);
+  letter-spacing: .2px;
+}
+.temp-live { width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0; }
+
+.hero-scroll {
+  position: absolute; bottom: 34px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; font-weight: 400; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--muted);
+  z-index: 2; opacity: 0;
+  animation: scroll-in 1s ease forwards 1.4s;
+}
+@keyframes scroll-in { to { opacity: .35; } }
+
+/* ══ DROPS ══ */
+#drops { padding: 90px 0 80px; overflow: hidden; }
+
+.drops-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  max-width: 1200px; margin: 0 auto; padding: 0 44px 36px;
+}
+.drops-left {}
+.section-label {
+  display: block; font-size: 10px; font-weight: 400;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px;
+}
+.section-h {
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 300;
+  letter-spacing: -0.5px; line-height: 1.1; color: var(--text);
+}
+.swipe-hint {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding-bottom: 6px;
+}
+
+.cards-track {
+  display: flex; gap: 14px;
+  padding: 0 44px 24px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cards-track::-webkit-scrollbar { display: none; }
+
+/* ── experience card ── */
+.exp-card {
+  flex: 0 0 310px; height: 450px;
+  border-radius: 18px; overflow: hidden;
+  position: relative; scroll-snap-align: start;
+  cursor: none;
+  transition: transform .3s cubic-bezier(.22,1,.36,1);
+}
+.exp-card:hover { transform: scale(1.016); }
+
+.card-visual { position: absolute; inset: 0; z-index: 0; }
+
+/* card gradient scenes */
+.card-rooftop   .card-visual { background: radial-gradient(ellipse at 28% 82%,rgba(255,135,35,.58) 0%,transparent 48%), radial-gradient(ellipse at 74% 78%,rgba(255,85,15,.42) 0%,transparent 44%), radial-gradient(ellipse at 52% 14%,rgba(65,28,195,.48) 0%,transparent 54%), radial-gradient(ellipse at 8%  42%,rgba(135,55,240,.2) 0%,transparent 38%), #0C0B14; }
+.card-karaoke   .card-visual { background: radial-gradient(ellipse at 52% 58%,rgba(255,28,118,.52) 0%,transparent 54%), radial-gradient(ellipse at 82% 28%,rgba(200,38,255,.38) 0%,transparent 48%), radial-gradient(ellipse at 14% 72%,rgba(255,75,198,.32) 0%,transparent 44%), #0D090F; }
+.card-bonfire   .card-visual { background: radial-gradient(ellipse at 50% 92%,rgba(255,108,18,.62) 0%,transparent 48%), radial-gradient(ellipse at 28% 78%,rgba(255,55,8,.42) 0%,transparent 38%), radial-gradient(ellipse at 62% 8%, rgba(18,48,108,.52) 0%,transparent 58%), radial-gradient(ellipse at 82% 22%,rgba(28,68,148,.3) 0%,transparent 38%), #0A0E16; }
+.card-jazz      .card-visual { background: radial-gradient(ellipse at 32% 52%,rgba(48,58,240,.48) 0%,transparent 54%), radial-gradient(ellipse at 76% 68%,rgba(78,28,210,.38) 0%,transparent 48%), radial-gradient(ellipse at 58% 18%,rgba(28,48,188,.32) 0%,transparent 42%), #08080F; }
+.card-venice    .card-visual { background: radial-gradient(ellipse at 62% 72%,rgba(72,198,178,.38) 0%,transparent 50%), radial-gradient(ellipse at 18% 38%,rgba(28,198,148,.26) 0%,transparent 48%), radial-gradient(ellipse at 72% 18%,rgba(188,118,38,.32) 0%,transparent 44%), #080E0D; }
+
+.card-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, transparent 18%, rgba(10,10,10,.48) 52%, rgba(8,8,8,.94) 100%);
+}
+
+/* card top badges */
+.card-top {
+  position: absolute; top: 15px; left: 15px; right: 15px;
+  z-index: 3; display: flex; justify-content: space-between; align-items: flex-start;
+}
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px; font-weight: 400; letter-spacing: .4px;
+  color: rgba(245,243,239,.78);
+  background: rgba(8,8,8,.48); border: .5px solid rgba(245,243,239,.14);
+  border-radius: 20px; padding: 3px 9px; backdrop-filter: blur(10px);
+}
+.scarcity {
+  font-size: 10px; font-weight: 500;
+  color: #0A0A0A; background: var(--gold);
+  border-radius: 20px; padding: 3px 10px; white-space: nowrap;
+}
+.scarcity.closed {
+  background: rgba(245,243,239,.12); color: var(--muted2);
+}
+
+/* card timer */
+.card-timer {
+  position: absolute; top: 15px; right: 15px; z-index: 4;
+  font-size: 10px; letter-spacing: .4px; color: rgba(245,243,239,.5);
+}
+
+/* card body */
+.card-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 3; padding: 18px;
+}
+.card-title {
+  font-size: 21px; font-weight: 400;
+  line-height: 1.22; letter-spacing: -.2px;
+  color: var(--text); margin-bottom: 9px;
+}
+.card-meta {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: 11px; font-weight: 300; color: var(--muted2);
+  letter-spacing: .15px; margin-bottom: 13px;
+}
+.sep { opacity: .35; }
+
+/* attendee bubbles */
+.attendees { display: flex; align-items: center; margin-bottom: 14px; }
+.av {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid var(--bg); margin-left: -7px; overflow: hidden;
+}
+.av:first-child { margin-left: 0; }
+.av-a { background: linear-gradient(135deg,#f093fb,#f5576c); }
+.av-b { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+.av-c { background: linear-gradient(135deg,#43e97b,#38f9d7); }
+.av-d { background: linear-gradient(135deg,#ffecd2,#fcb69f); }
+.av-e { background: linear-gradient(135deg,#a18cd1,#fbc2eb); }
+.av-count { margin-left: 9px; font-size: 11px; font-weight: 300; color: var(--muted2); }
+
+.card-btn {
+  display: block; width: 100%;
+  background: rgba(245,243,239,.07);
+  border: .5px solid rgba(245,243,239,.12); border-radius: 9px;
+  padding: 11px; font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 400; color: var(--text);
+  cursor: none; text-align: center; letter-spacing: .1px;
+  backdrop-filter: blur(12px);
+  transition: background .2s, border-color .2s, color .2s;
+}
+.card-btn:hover {
+  background: rgba(255,199,44,.1);
+  border-color: rgba(255,199,44,.3);
+  color: var(--gold);
+}
+.card-btn.disabled {
+  color: var(--muted); cursor: not-allowed; pointer-events: none;
+}
+
+/* ══ PITCH ══ */
+#pitch { border-top: .5px solid var(--border); border-bottom: .5px solid var(--border); padding: 0; }
+.pitch-inner {
+  max-width: 1200px; margin: 0 auto; padding: 100px 44px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.pitch-h {
+  font-size: clamp(34px, 5vw, 68px);
+  font-weight: 300;
+  letter-spacing: -1px; line-height: 1.06;
+  color: var(--text); margin-bottom: 18px;
+}
+.pitch-sub {
+  font-size: 16px; font-weight: 300; color: var(--muted2); line-height: 1.75;
+}
+.features { display: flex; flex-direction: column; gap: 34px; }
+.feature { display: flex; gap: 20px; align-items: flex-start; }
+.feat-n {
+  font-size: 10px; font-weight: 400; letter-spacing: 2px;
+  color: var(--gold); padding-top: 3px; flex-shrink: 0;
+}
+.feat-body h3 {
+  font-size: 14px; font-weight: 500; letter-spacing: -.1px;
+  color: var(--text); margin-bottom: 5px;
+}
+.feat-body p {
+  font-size: 13px; font-weight: 300; color: var(--muted2); line-height: 1.72;
+}
+
+/* ══ CONCIERGE ══ */
+#concierge {
+  background: var(--surface);
+  border-top: .5px solid var(--border);
+  border-bottom: .5px solid var(--border);
+  padding: 90px 44px;
+  text-align: center;
+}
+.concierge-inner { max-width: 820px; margin: 0 auto; }
+.concierge-tag {
+  display: block; font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 38px;
+}
+.concierge-q {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(22px, 3.2vw, 40px);
+  font-style: italic; font-weight: 400;
+  line-height: 1.5; letter-spacing: -.2px; color: var(--text);
+}
+.concierge-q em { color: var(--gold); font-style: italic; }
+.concierge-q .dim { color: var(--muted2); }
+
+/* ══ PROOF ══ */
+#proof { padding: 100px 0; border-top: .5px solid var(--border); }
+.proof-wrap { max-width: 1100px; margin: 0 auto; padding: 0 44px; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: .5px solid var(--border); border-radius: 14px;
+  overflow: hidden; margin-bottom: 64px;
+}
+.stat {
+  background: var(--bg); padding: 38px 32px;
+  text-align: center; display: flex; flex-direction: column; gap: 7px;
+}
+.stat-n {
+  font-size: 58px; font-style: italic; font-weight: 300;
+  letter-spacing: -3px; line-height: 1; color: var(--text);
+}
+.stat-k {
+  font-size: 10px; font-weight: 400; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.quotes { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.q-card {
+  background: var(--surface); border: .5px solid var(--border);
+  border-radius: 14px; padding: 28px 26px;
+}
+.q-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px; font-style: italic; font-weight: 400;
+  line-height: 1.58; color: var(--text); margin-bottom: 16px;
+}
+.q-attr {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+
+/* ══ ACCESS ══ */
+#access {
+  border-top: .5px solid var(--border);
+  padding: 0; text-align: center;
+}
+.access-inner {
+  max-width: 480px; margin: 0 auto; padding: 100px 44px;
+}
+.access-h {
+  font-size: clamp(30px, 4.2vw, 56px);
+  font-weight: 300;
+  letter-spacing: -0.8px; line-height: 1.1;
+  color: var(--text); margin-bottom: 12px;
+}
+.access-p {
+  font-size: 14px; font-weight: 300; color: var(--muted2);
+  line-height: 1.72; margin-bottom: 40px;
+}
+
+#waitlist-form { display: flex; flex-direction: column; gap: 10px; }
+.f-input {
+  background: var(--surface); border: .5px solid var(--border2);
+  border-radius: 11px; padding: 14px 18px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: var(--text); outline: none;
+  transition: border-color .2s; cursor: text;
+}
+.f-input::placeholder { color: var(--muted); }
+.f-input:focus { border-color: rgba(255,199,44,.4); }
+
+.f-submit {
+  background: var(--gold); color: #0A0A0A; border: none;
+  border-radius: 11px; padding: 15px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 500; letter-spacing: -.2px;
+  cursor: none; margin-top: 4px;
+  transition: opacity .2s;
+}
+.f-submit:hover { opacity: .87; }
+
+.wl-note {
+  font-size: 11px; font-weight: 300; color: var(--muted);
+  letter-spacing: .3px; margin-top: 12px;
+}
+
+/* confirmed state */
+.access-confirmed {
+  display: none; flex-direction: column;
+  align-items: center; gap: 10px; padding: 40px 0;
+}
+.access-confirmed.show { display: flex; }
+.confirmed-n {
+  font-size: 80px; font-style: italic; font-weight: 300;
+  letter-spacing: -4px; line-height: 1; color: var(--text);
+}
+.confirmed-sub { font-size: 14px; font-weight: 300; color: var(--muted2); }
+.confirmed-msg {
+  font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--muted); margin-top: 6px;
+}
+
+/* invite code nudge */
+.code-nudge {
+  font-size: 11px; font-weight: 300; color: var(--gold);
+  margin-top: 8px; opacity: 0; transition: opacity .3s;
+}
+.code-nudge.show { opacity: 1; }
+
+/* ══ FOOTER ══ */
+footer {
+  border-top: .5px solid var(--border); padding: 28px 44px;
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 1200px; margin: 0 auto;
+}
+.footer-logo { font-size: 13px; font-weight: 500; color: var(--text); }
+.footer-r { font-size: 11px; font-weight: 300; color: var(--muted); letter-spacing: .4px; }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 768px) {
+  nav { padding: 18px 24px; }
+  .nav-status { display: none; }
+  #hero { padding: 100px 24px 70px; }
+  .hero-h { letter-spacing: -1.5px; }
+  .drops-header { padding: 0 24px 28px; }
+  .cards-track { padding: 0 24px 20px; }
+  .exp-card { flex: 0 0 285px; height: 430px; }
+  .pitch-inner { grid-template-columns:1fr; gap: 48px; padding: 70px 24px; }
+  #concierge { padding: 70px 24px; }
+  .proof-wrap { padding: 0 24px; }
+  .stats { grid-template-columns: 1fr; }
+  .quotes { grid-template-columns: 1fr; }
+  .access-inner { padding: 80px 24px; }
+  footer { padding: 24px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div id="cursor"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <span class="nav-logo">afterhours</span>
+  <div class="nav-right">
+    <span class="nav-status"><span class="status-dot"></span>usc beta</span>
+    <a href="#access" class="nav-apply">apply →</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-bokeh" aria-hidden="true">
+    <div class="bokeh-layer">
+      <div class="bk bk1"></div>
+      <div class="bk bk2"></div>
+      <div class="bk bk3"></div>
+      <div class="bk bk4"></div>
+      <div class="bk bk5"></div>
+    </div>
+  </div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      usc · los angeles · invite-only
+    </div>
+
+    <h1 class="hero-h">something good<br>is happening tonight.</h1>
+
+    <p class="hero-p">curated social experiences for college students who aren't satisfied with random parties.</p>
+
+    <a href="#access" class="btn-primary">join usc beta →</a>
+
+    <div class="social-temp">
+      <span class="temp-live"></span>
+      <span id="temp-text">312 students online · everyone's going out tonight</span>
+    </div>
+  </div>
+
+  <span class="hero-scroll">scroll</span>
+</section>
+
+<!-- ═══ DROPS ═══ -->
+<section id="drops">
+  <div class="drops-header">
+    <div class="drops-left">
+      <span class="section-label">dropping tonight</span>
+      <h2 class="section-h">tonight in los angeles.</h2>
+    </div>
+    <span class="swipe-hint">swipe →</span>
+  </div>
+
+  <div class="cards-track">
+
+    <!-- rooftop dinner -->
+    <div class="exp-card card-rooftop">
+      <div class="card-visual"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag">intimate</span>
+          <span class="tag">dinner</span>
+          <span class="tag">rooftop</span>
+        </div>
+        <span class="scarcity">2 left</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">rooftop dinner in silver lake</h3>
+        <div class="card-meta">
+          <span>silver lake</span><span class="sep">·</span>
+          <span>9 pm</span><span class="sep">·</span>
+          <span>8 people</span>
+        </div>
+        <div class="attendees">
+          <div class="av av-a"></div>
+          <div class="av av-b"></div>
+          <div class="av av-c"></div>
+          <div class="av av-d"></div>
+          <span class="av-count">+ 4 attending</span>
+        </div>
+        <button class="card-btn">request invite →</button>
+      </div>
+    </div>
+
+    <!-- koreatown karaoke -->
+    <div class="exp-card card-karaoke">
+      <div class="card-visual"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag">chaotic</span>
+          <span class="tag">karaoke</span>
+        </div>
+        <span class="scarcity">1 left</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">koreatown karaoke run</h3>
+        <div class="card-meta">
+          <span>koreatown</span><span class="sep">·</span>
+          <span>10 pm</span><span class="sep">·</span>
+          <span>6 people</span>
+        </div>
+        <div class="attendees">
+          <div class="av av-b"></div>
+          <div class="av av-d"></div>
+          <div class="av av-a"></div>
+          <span class="av-count">+ 3 attending</span>
+        </div>
+        <button class="card-btn">request invite →</button>
+      </div>
+    </div>
+
+    <!-- santa monica bonfire -->
+    <div class="exp-card card-bonfire">
+      <div class="card-visual"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag">chill</span>
+          <span class="tag">beach</span>
+          <span class="tag">bonfire</span>
+        </div>
+        <span class="scarcity">3 left</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">santa monica bonfire</h3>
+        <div class="card-meta">
+          <span>santa monica</span><span class="sep">·</span>
+          <span>sunset</span><span class="sep">·</span>
+          <span>10 people</span>
+        </div>
+        <div class="attendees">
+          <div class="av av-c"></div>
+          <div class="av av-a"></div>
+          <div class="av av-e"></div>
+          <div class="av av-b"></div>
+          <span class="av-count">+ 6 attending</span>
+        </div>
+        <button class="card-btn">request invite →</button>
+      </div>
+    </div>
+
+    <!-- dtla jazz — closed -->
+    <div class="exp-card card-jazz">
+      <div class="card-visual"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag">intimate</span>
+          <span class="tag">jazz</span>
+        </div>
+        <span class="scarcity closed">invite only</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">after-hours jazz apartment</h3>
+        <div class="card-meta">
+          <span>dtla</span><span class="sep">·</span>
+          <span>11 pm</span><span class="sep">·</span>
+          <span>private</span>
+        </div>
+        <div class="attendees">
+          <div class="av av-d"></div>
+          <div class="av av-b"></div>
+          <div class="av av-c"></div>
+          <span class="av-count">8 invited</span>
+        </div>
+        <button class="card-btn disabled">closed · invite only</button>
+      </div>
+    </div>
+
+    <!-- venice taco run -->
+    <div class="exp-card card-venice">
+      <div class="card-visual"></div>
+      <div class="card-overlay"></div>
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag">spontaneous</span>
+          <span class="tag">late-night</span>
+        </div>
+        <span class="scarcity">5 left</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">venice late-night taco run</h3>
+        <div class="card-meta">
+          <span>venice beach</span><span class="sep">·</span>
+          <span>midnight</span><span class="sep">·</span>
+          <span>8 people</span>
+        </div>
+        <div class="attendees">
+          <div class="av av-a"></div>
+          <div class="av av-c"></div>
+          <div class="av av-e"></div>
+          <span class="av-count">+ 3 attending</span>
+        </div>
+        <button class="card-btn">request invite →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ PITCH ═══ -->
+<section id="pitch">
+  <div class="pitch-inner">
+    <div class="pitch-left">
+      <span class="section-label">the idea</span>
+      <h2 class="pitch-h">not another event app.</h2>
+      <p class="pitch-sub">your social life, intelligently curated. the right people, the right night — no planning required.</p>
+    </div>
+    <div class="pitch-right">
+      <div class="features">
+        <div class="feature">
+          <span class="feat-n">01</span>
+          <div class="feat-body">
+            <h3>vibe intelligence</h3>
+            <p>knows your energy, not just your interests. chaotic vs. chill. intimate vs. large. spontaneous vs. planner.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="feat-n">02</span>
+          <div class="feat-body">
+            <h3>experience drops</h3>
+            <p>exclusive, time-limited, designed to be shared. each drop expires. scarcity creates momentum.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="feat-n">03</span>
+          <div class="feat-body">
+            <h3>your circle</h3>
+            <p>tracks who you actually vibe with. not followers. the people you'd hang with again.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONCIERGE ═══ -->
+<section id="concierge">
+  <div class="concierge-inner">
+    <span class="concierge-tag">ai social concierge</span>
+    <p class="concierge-q">
+      "you'd probably get along with <em>maya</em> and <em>evan</em> tonight.<br>
+      <span class="dim">smaller crowd. better fit for your energy."</span>
+    </p>
+  </div>
+</section>
+
+<!-- ═══ PROOF ═══ -->
+<section id="proof">
+  <div class="proof-wrap">
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-n" data-target="482">0</span>
+        <span class="stat-k">students this week</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" data-target="12">0</span>
+        <span class="stat-k">dinners tonight</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" data-target="48">0</span>
+        <span class="stat-k">people matched today</span>
+      </div>
+    </div>
+
+    <div class="quotes">
+      <div class="q-card">
+        <p class="q-text">"I met more people in 2 weeks than my entire freshman year."</p>
+        <span class="q-attr">USC sophomore · 2025</span>
+      </div>
+      <div class="q-card">
+        <p class="q-text">"It feels like someone curates your social life."</p>
+        <span class="q-attr">USC junior · transferred</span>
+      </div>
+      <div class="q-card">
+        <p class="q-text">"Way better than random parties. I actually remember these nights."</p>
+        <span class="q-attr">USC senior · creative writing</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ACCESS ═══ -->
+<section id="access">
+  <div class="access-inner">
+    <span class="section-label" style="display:block;margin-bottom:14px">early access</span>
+    <h2 class="access-h">something good<br>is starting at usc.</h2>
+    <p class="access-p">limited spots. rolling invites through campus ambassadors, greek life, and creative clubs.</p>
+
+    <form id="waitlist-form" novalidate>
+      <input type="email" class="f-input" id="wl-email" name="email" placeholder="your usc email" required autocomplete="email">
+      <input type="text"  class="f-input" id="wl-code"  name="invite-code" placeholder="invite code (optional)">
+      <p class="code-nudge" id="code-nudge">have a code? it moves you up the list.</p>
+      <button type="submit" class="f-submit">apply for access →</button>
+    </form>
+    <p class="wl-note" id="wl-note">by applying you agree to be part of the usc beta.</p>
+
+    <div class="access-confirmed" id="access-confirmed">
+      <span class="confirmed-n" id="confirmed-n">—</span>
+      <span class="confirmed-sub">you're in line.</span>
+      <span class="confirmed-msg">"something good is coming."</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <span class="footer-logo">afterhours</span>
+  <span class="footer-r">© 2025 · los angeles</span>
+</footer>
+
+<script>
+
+/* ── cursor ── */
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+const hoverable = 'a, button, .exp-card, .nav-apply, .btn-primary, .f-input';
+document.querySelectorAll(hoverable).forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('big'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('big'));
+});
+
+/* ── social temperature ticker ── */
+const temps = [
+  '312 students online · everyone\'s going out tonight',
+  '8 new drops in the last hour',
+  '48 people matched into plans today',
+  'quiet afternoon · picks up after 9 pm',
+  '12 dinners happening across los angeles',
+  '3 invite codes used in the last 10 min',
+];
+let tIdx = 0;
+const tempEl = document.getElementById('temp-text');
+tempEl.style.transition = 'opacity .3s ease';
+setInterval(() => {
+  tempEl.style.opacity = '0';
+  setTimeout(() => {
+    tIdx = (tIdx + 1) % temps.length;
+    tempEl.textContent = temps[tIdx];
+    tempEl.style.opacity = '1';
+  }, 320);
+}, 3800);
+
+/* ── counter animation on scroll ── */
+function animateCount(el) {
+  const target = +el.dataset.target;
+  const dur = 1100;
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(ease * target);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  })(t0);
+}
+
+let counted = false;
+const counters = document.querySelectorAll('.stat-n[data-target]');
+new IntersectionObserver(entries => {
+  if (!counted && entries.some(e => e.isIntersecting)) {
+    counted = true;
+    counters.forEach(animateCount);
+  }
+}, { threshold: 0.4 }).observe(document.querySelector('#proof'));
+
+/* ── invite code nudge ── */
+const codeInput = document.getElementById('wl-code');
+const codeNudge = document.getElementById('code-nudge');
+document.getElementById('wl-email').addEventListener('input', function() {
+  if (this.value.length > 5) codeNudge.classList.add('show');
+});
+
+/* ── airtable config ────────────────────────────────────────────────────────
+   1. Sign up free at airtable.com
+   2. Create a base called "AfterHours Waitlist" — the table will be auto-created
+   3. Get your Base ID from the URL: airtable.com/YOUR_BASE_ID/...
+   4. Get a Personal Access Token: airtable.com/create/tokens
+      → scope: data.records:write  → access: your base only
+   5. Paste both below
+   ─────────────────────────────────────────────────────────────────────────── */
+const AIRTABLE = {
+  token:   'YOUR_AIRTABLE_TOKEN',   // ← pat_... token from airtable.com/create/tokens
+  baseId:  'YOUR_BASE_ID',          // ← appXXXXXXXXXXXXXX from the URL
+  table:   'Waitlist',
+};
+
+async function saveToAirtable(email, code, queueNum) {
+  if (AIRTABLE.token === 'YOUR_AIRTABLE_TOKEN') return; // skip if not configured
+  try {
+    await fetch(`https://api.airtable.com/v0/${AIRTABLE.baseId}/${encodeURIComponent(AIRTABLE.table)}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            'Email':       email,
+            'Invite Code': code || '',
+            'School':      'USC',
+            'Queue #':     queueNum,
+            'Status':      'Waitlisted',
+          }
+        }]
+      }),
+    });
+  } catch (err) {
+    console.warn('Airtable sync failed (signup still recorded):', err);
+  }
+}
+
+/* ── waitlist form ── */
+document.getElementById('waitlist-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const email = document.getElementById('wl-email').value.trim();
+  const code  = document.getElementById('wl-code').value.trim();
+  if (!email || !email.includes('@')) return;
+
+  const base = 750 + Math.floor(Math.random() * 200);
+  const num  = code ? Math.max(base - 180, 100) : base;
+
+  // fire-and-forget — doesn't block the UX
+  saveToAirtable(email, code, num);
+
+  this.style.display = 'none';
+  codeNudge.style.display = 'none';
+  document.getElementById('wl-note').style.display = 'none';
+
+  const conf  = document.getElementById('access-confirmed');
+  const numEl = document.getElementById('confirmed-n');
+  conf.classList.add('show');
+
+  let cur = 0;
+  const iv = setInterval(() => {
+    cur += Math.ceil((num - cur) * 0.07) || 1;
+    numEl.textContent = '#' + cur;
+    if (cur >= num) { numEl.textContent = '#' + num; clearInterval(iv); }
+  }, 28);
+});
+
+/* ── experience card request buttons ── */
+document.querySelectorAll('.card-btn:not(.disabled)').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.textContent = 'requested ✓';
+    this.style.color = 'var(--gold)';
+    this.style.borderColor = 'rgba(255,199,44,.3)';
+    this.style.background = 'rgba(255,199,44,.06)';
+    this.style.pointerEvents = 'none';
+  });
+});
+
+</script>
+</body>
+</html>
